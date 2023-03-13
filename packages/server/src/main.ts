@@ -1,9 +1,13 @@
-const express = require('express');
+import express from 'express';
+import { createServer } from "http";
+import { Server } from "socket.io";
+
 const app = express();
-const http = require('http').createServer(app);
-const io = require('socket.io')(http, {
+const httpServer = createServer(app);
+
+const io = new Server(httpServer, {
   cors: {
-    origin: 'http://127.0.0.1:5173',
+    origin: 'http://127.0.0.1:5174',
     methods: ['GET', 'POST'],
     credentials: true,
   }
@@ -22,6 +26,6 @@ io.on('connection', (socket) => {
   });
 });
 
-http.listen(3000, () => {
+httpServer.listen(3000, () => {
   console.log('listening on *:3000');
 });
