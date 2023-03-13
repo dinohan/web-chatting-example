@@ -1,0 +1,13 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "node src/main.js"
+  },
+  "dependencies": {
+    "express": "4",
+    "socket.io": "^4.6.0"
+  }
+}
