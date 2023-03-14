@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
+import { SERVER_URL } from './constansts';
 
-const socket = io('http://localhost:3000', { withCredentials: true });
+const socket = io(SERVER_URL, { withCredentials: true });
 
-function ChatRoom() {
-  const [user] = useState(() => `user-${Math.floor(Math.random() * 1000)}`)
+function ChatRoom({
+  user,
+}: {
+  user: string;
+}) {
   const [messages, setMessages] = useState<{ user: string, msg: string }[]>([]);
   const [inputValue, setInputValue] = useState('');
 
