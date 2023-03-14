@@ -8,5 +8,12 @@
   "main": "index.js",
   "repository": "https://github.com/dinohan/web-chatting-example",
   "author": "dinohan",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "lerna": "^6.5.1"
+  },
+  "devDependencies": {
+    "nx": "15.8.6",
+    "@nrwl/nx-cloud": "latest"
+  }
 }

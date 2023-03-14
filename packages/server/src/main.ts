@@ -7,6 +7,7 @@ import http2Express from 'http2-express-bridge';
 import cors from 'cors';
 import { createServer } from 'http';
 import type { PushSubscription }  from 'web-push';
+import NGROK from '@dinohan/ngrok'
 
 const app = http2Express(express)
 app.use(express.static('public'));
@@ -23,7 +24,7 @@ const httpsServer = createSecureServer(option, app)
 
 const io = new Server(httpsServer, {
   cors: {
-    origin: 'https://d035e17593b2.ngrok.app',
+    origin: NGROK.client,
     methods: ['GET', 'POST'],
     credentials: true,
   }
@@ -60,21 +61,21 @@ app.get('/vapidPublicKey', (req, res) => {
 });
 
 app.post('/register', function(req, res) {
+  const id = req.body.userId
   const newId = Math.random().toString(36).substring(7);
   const newUser = {
-    id: newId,
+    id: id || newId,
   };
   users.push(newUser);
-  console.log('register', newUser)
   res.status(201).json({
     data: {
-      id: newId
+      id: newUser.id
     }
   });
 });
 
 app.post('/subscription', (req, res) => {
-  console.log('/subscription')
+  console.log('[subscription]', { id: req.body.user })
   const id = req.body.user;
   const subscription = req.body.subscription;
   const user = users.find(user => user.id === id);
@@ -107,18 +108,15 @@ app.post('/sendNotification', (req, res) => {
 
 io.on('connection', (socket) => {
   console.log('a user connected');
-  socket.on('login', (user) => {
-    console.log('login', user);
-    users.push(user);
-  });
-  socket.on('write', ({ user, msg }) => {
-    console.log('message', user, msg);
-    socket.broadcast.emit('msg', { user, msg });
+  socket.on('write', ({ userId, msg }) => {
+    console.log('message', userId, msg);
+    socket.broadcast.emit('msg', { userId, msg });
     users.forEach(receiver => {
-      if (receiver.subscription && receiver.id !== user) {
-
+      console.log('[receiver]', receiver.id)
+      if (receiver.subscription && receiver.id !== userId) {
         webPush.sendNotification(receiver.subscription, JSON.stringify({
-          title: user,
+          title: userId,
+          url: receiver.id,
           msg,
         }), {
           TTL: 60

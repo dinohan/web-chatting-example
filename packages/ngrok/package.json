@@ -1,0 +1,8 @@
+{
+  "name": "@dinohan/ngrok",
+  "version": "0.0.1",
+  "description": "url",
+  "main": "index.cjs",
+  "module": "index.js",
+  "types": "index.d.ts"
+}

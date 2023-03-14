@@ -1,1 +1,0 @@
-export const SERVER_URL = 'https://5b41755ace00.ngrok.app'

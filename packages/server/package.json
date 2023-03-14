@@ -9,6 +9,7 @@
     "dev": "nodemon --watch \"src/**/*.ts\" --exec \"ts-node\" src/main.ts"
   },
   "dependencies": {
+    "@dinohan/ngrok": "*",
     "cors": "^2.8.5",
     "express": "4",
     "http": "^0.0.1-security",
