@@ -74,7 +74,7 @@ app.post('/register', function(req, res) {
 });
 
 app.post('/subscription', (req, res) => {
-  console.log('@@@', req.body)
+  console.log('/subscription')
   const id = req.body.user;
   const subscription = req.body.subscription;
   const user = users.find(user => user.id === id);
@@ -115,7 +115,6 @@ io.on('connection', (socket) => {
     console.log('message', user, msg);
     socket.broadcast.emit('msg', { user, msg });
     users.forEach(receiver => {
-      console.log(receiver)
       if (receiver.subscription && receiver.id !== user) {
 
         webPush.sendNotification(receiver.subscription, JSON.stringify({

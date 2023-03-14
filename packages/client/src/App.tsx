@@ -15,66 +15,80 @@ function urlBase64ToUint8Array(base64String: string) {
   return outputArray;
 }
 
-function getVapidKey() {
-  return fetch(`${SERVER_URL}/vapidPublicKey`).then(response => {
-    return response.json()
-  }).then(data => {
-    return data.data
+const getVapidKey = async () => {
+  const response = await fetch(`${SERVER_URL}/vapidPublicKey`);
+  const data = await response.json();
+  return data.data as string;
+}
+
+const postRegister = async () => {
+  const response = await fetch(`${SERVER_URL}/register`, {
+    method: "POST",
+    headers: {
+        "content-type": "application/json",
+    },
   })
+  const data = await response.json()
+  return data.data.id as string
+}
+
+const registerServiceWorker = async () => {
+  if ('serviceWorker' in navigator && 'PushManager' in window) {
+    const registration = await navigator.serviceWorker.ready
+    const subscription = await registration.pushManager.getSubscription()
+    if (subscription) {
+      return subscription
+    }
+
+    const vapidPublicKey = await getVapidKey()
+    const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
+
+    return await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: convertedVapidKey
+    });
+  }
+}
+
+const postSubscription = async (user: string, subscription: PushSubscription) => {
+  const response = await fetch(`${SERVER_URL}/subscription`, {
+    method: 'post',
+    headers: {
+      'Content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      user: user,
+      subscription: subscription
+    }),
+  });
+  const data = await response.json()
+  return data.data
+}
+
+const getUserFromQueryString = () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('user');
 }
 
 function App() {
-  const [user, setUser] = useState<string | undefined>(undefined)
+  const [user, setUser] = useState<string | null>(getUserFromQueryString)
+
+  const handleSetUser = (user: string) => {
+    setUser(user)
+    // set query string
+    window.history.pushState({}, '', `?user=${user}`);
+  }
 
   useEffect(() => {
-    fetch(`${SERVER_URL}/register`, {
-      method: "POST",
-      headers: {
-          "content-type": "application/json",
-      },
-    }).then(response => {
-      return response.json()
-    }).then(data => {
-      setUser(data.data.id)
-      return data.data.id
-    }).then((user) => {
-      if ('serviceWorker' in navigator && 'PushManager' in window) {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then(function(registration) {
-            return registration.pushManager.getSubscription()
-              .then(async function(subscription) {
-                // if (subscription) {
-                //   return subscription;
-                // }
-  
-                const vapidPublicKey = await getVapidKey()
-                const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
-  
-                return registration.pushManager.subscribe({
-                  userVisibleOnly: true,
-                  applicationServerKey: convertedVapidKey
-                });
-              });
-          })
+    postRegister()
+      .then((user) => {
+        handleSetUser(user)
+        registerServiceWorker()
           .then((subscription) => {
-            console.log(subscription)
-            fetch(`${SERVER_URL}/subscription`, {
-              method: 'post',
-              headers: {
-                'Content-type': 'application/json'
-              },
-              body: JSON.stringify({
-                user: user,
-                subscription: subscription
-              }),
-            });
-          });
-      }
-    })
-  }, [])
-
-  useEffect(() => {
-    
+            if (!subscription) { return }
+            postSubscription(user, subscription)
+          })
+      })
   }, [])
 
   if (!user) {
