@@ -10,6 +10,10 @@ export default defineConfig({
       cert: fs.readFileSync('../certs/cert.crt'),
     },
     host: true,
+    port: 5112,
+  },
+  preview: {
+    port: 5112,
   },
   plugins: [
     react(),

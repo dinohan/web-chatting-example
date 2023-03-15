@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import NGROK_URL from '@dinohan/ngrok';
 
-const socket = io(NGROK_URL.server, { withCredentials: true });
+const socket = io(NGROK_URL.server);
 
 function ChatRoom({
   userId,

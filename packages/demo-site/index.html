@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React + TS</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+
+    <style>
+      iframe {
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+      }
+    </style>
+
+    <iframe frameborder="0"> </iframe>
+
+    <script>
+      const innerHtml = `
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+          <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+          />
+          <title>Vite + React + TS</title>
+          <script
+            type="module"
+            crossorigin
+            src="https://19f6e2bc9b77.ngrok.app/assets/index-ba2f8913.js"
+          ><\/script>
+        </head>
+        <body>
+          <div id="root"></div>
+        </body>
+      </html>
+      `;
+      const iframe = document.querySelector("iframe");
+
+      var scriptIsLoaded = false;
+
+      const loadScript = () => {
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        doc.open();
+        doc.write(innerHtml);
+        doc.close();
+        scriptIsLoaded = true;
+      };
+
+      if (!iframe.onload) {
+        loadScript();
+      }
+
+      iframe.onload = function () {
+        if (!scriptIsLoaded) {
+          loadScript();
+        }
+      };
+    </script>
+  </body>
+</html>

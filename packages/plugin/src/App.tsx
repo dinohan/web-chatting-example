@@ -36,7 +36,9 @@ const postRegister = async (userId: string | null) => {
 }
 
 const registerServiceWorker = async () => {
+  const navigator = window.parent.navigator
   if ('serviceWorker' in navigator && 'PushManager' in window) {
+    
     const registration = await navigator.serviceWorker.ready
     const subscription = await registration.pushManager.getSubscription()
     if (subscription) {

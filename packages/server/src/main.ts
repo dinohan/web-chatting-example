@@ -24,9 +24,8 @@ const httpsServer = createSecureServer(option, app)
 
 const io = new Server(httpsServer, {
   cors: {
-    origin: NGROK.client,
+    origin: "*",
     methods: ['GET', 'POST'],
-    credentials: true,
   }
 });
 
